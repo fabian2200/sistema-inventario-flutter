@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 import 'package:sistema_inventario/http/productos.dart';
 import 'package:sistema_inventario/http/response.dart';
+import 'package:sistema_inventario/producto/registrarProducto.dart';
 
 class stockPage extends StatefulWidget {
   const stockPage({Key? key}) : super(key: key);
@@ -156,7 +157,13 @@ class __stockPageState extends State<stockPage> {
                             style: ButtonStyle(
                               backgroundColor: MaterialStateProperty.all<Color>(const Color.fromARGB(255, 16, 83, 7)), // Change the color here
                             ),
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.of(context).pop(); 
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(builder: (BuildContext context) => registrarProducto()),
+                              );
+                            },
                             child: const Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -248,7 +255,7 @@ class __stockPageState extends State<stockPage> {
                       ),
                     ),
                     controller: nombre,
-                    enabled: true,
+                    enabled: false,
                   ),
                   const SizedBox(height: 20),
                   TextField(
@@ -277,7 +284,7 @@ class __stockPageState extends State<stockPage> {
                       ),
                     ),
                     controller: existencia,
-                    enabled: true,
+                    enabled: false,
                   ),
                   const SizedBox(height: 20),
                   TextField(

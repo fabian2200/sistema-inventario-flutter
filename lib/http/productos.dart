@@ -135,4 +135,42 @@ class ProductosHTTP {
 
     return responseHttp;
   }
+
+  Future<ResponseHttp> registrarProducto(codigo_barras, descripcion, categoria, precio_compra, precio_venta, existencia, unidad_medida, imagen) async {
+    Dio dio = Dio();
+
+    ResponseHttp responseHttp = ResponseHttp("", 0);
+
+    Map<String, dynamic> datos = {
+      'codigo_barras': codigo_barras,
+      'descripcion': descripcion,
+      'categoria': categoria,
+      'precio_compra': precio_compra,
+      'precio_venta': precio_venta,
+      'existencia': existencia,
+      'unidad_medida': unidad_medida,
+      'imagen': imagen
+    };
+
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    var ip =  pref.getString('ip');
+    final link = "http://"+ip.toString()+":8000/registrar-producto-movil";
+
+    await dio.post(
+      link, data: datos,
+      options: Options(
+        contentType: 'application/json',
+      ),
+    ).then((value) {
+      var json = convert.jsonDecode(value.toString());
+      responseHttp.mensaje = json["mensaje"];
+      responseHttp.success = json["success"];
+    }).onError((error, stackTrace) {
+      responseHttp.mensaje = error.toString();
+      responseHttp.success = 0;
+    });
+
+    return responseHttp;
+  }
+
 }
