@@ -397,6 +397,9 @@ class __stockPageState extends State<stockPage> {
                           backgroundColor: MaterialStateProperty.all<Color>(const Color.fromARGB(255, 177, 10, 10)), // Change the color here
                         ),
                         onPressed: () {
+                          setState(() {
+                            existencia2.text = '';
+                          });
                           Navigator.of(context).pop(); 
                         },
                         child: const Row(
@@ -450,6 +453,9 @@ class __stockPageState extends State<stockPage> {
         Future.delayed(const Duration(milliseconds: 300), () {
           mostrarDialogoInfo(context, response.mensaje, Icons.check_circle, Colors.green);
           Future.delayed(const Duration(seconds: 2), () {
+            setState(() {
+              existencia2.text = '';
+            });
             Navigator.of(context).pop(); 
           });
         });

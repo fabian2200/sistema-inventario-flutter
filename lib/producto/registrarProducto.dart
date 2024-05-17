@@ -339,7 +339,17 @@ class _registrarProductoState extends State<registrarProducto> {
     ResponseHttp response =  await productosHTTP.registrarProducto(_codigo_baras.text, _descripcion.text, selectedCategory, _precio_compra.text, _precio_venta.text, _existencia.text, selectedUnidad, _base64Image);
     cerrarDialogo(context);
     if(response.success == 1){
-       showDialog(
+      setState(() {
+        _codigo_baras.text = '';
+        _descripcion.text = '';
+        _precio_compra.text = '';
+        _precio_venta.text = '';
+        _existencia.text = '';
+        selectedCategory = '';
+        selectedUnidad = '';
+        _imageSelected = false;
+      });
+      showDialog(
         context: context,
         barrierDismissible: true,
         builder: (BuildContext context) {
@@ -352,7 +362,7 @@ class _registrarProductoState extends State<registrarProducto> {
                   children: <Widget>[
                     Icon(Icons.check_circle, size: 50, color: Colors.green),
                     SizedBox(height: 20),
-                    Text('Producto modificado correctamente'),
+                    Text('Producto registrado correctamente'),
                   ],
                 ),
               ),

@@ -139,6 +139,7 @@ class _InventarioPageState extends State<InventarioPage> {
                       columns: const [
                         DataColumn(label: Text('Descripción', style: TextStyle( fontFamily: 'Poppins', fontWeight: FontWeight.bold))),
                         DataColumn(label: Text('Existencia', style: TextStyle( fontFamily: 'Poppins', fontWeight: FontWeight.bold))),
+                        DataColumn(label: Text('', style: TextStyle( fontFamily: 'Poppins', fontWeight: FontWeight.bold), textAlign: TextAlign.center)),
                       ],
                       rows: listaProductos
                           .map(
@@ -146,15 +147,26 @@ class _InventarioPageState extends State<InventarioPage> {
                               cells: [
                                 DataCell(Text(producto['descripcion'], style: const TextStyle( fontFamily: 'Poppins'))),
                                 DataCell(Text(producto['existencia'].toString()+" "+producto['unidad_medida'].toString(), style: const TextStyle( fontFamily: 'Poppins'))),
+                                DataCell(
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        const Icon(Icons.delete_rounded, color: Colors.red),
+                                        const SizedBox(width: 10),
+                                        GestureDetector(
+                                          child: const Icon(Icons.edit, color: Colors.orange),
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              BouncyPageRoute(widget: editarProducto(productId: producto['id']))
+                                            );
+                                          },
+                                        )
+                                      ],
+                                    )
+                                  ),
                               ],
-                              onSelectChanged: (isSelected) {
-                                if (isSelected!) {
-                                  Navigator.push(
-                                    context,
-                                    BouncyPageRoute(widget: editarProducto(productId: producto['id']))
-                                  );
-                                }
-                              },
+       
                             )
                           )
                           .toList(),

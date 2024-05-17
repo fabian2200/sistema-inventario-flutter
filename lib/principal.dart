@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sistema_inventario/categoria/listaCategorias.dart';
 import 'package:sistema_inventario/components/BouncyPageRoute.dart';
 import 'package:sistema_inventario/paginaInventario.dart';
 import 'package:sistema_inventario/producto/stock.dart';
@@ -78,7 +79,15 @@ class _PrincipalState extends State<Principal> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildSquareContainer('assets/ventas.png'),
+               GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    BouncyPageRoute(widget: const categoriaPage())
+                  );   
+                },
+                child:  _buildSquareContainer('assets/categorias.png'),
+              ),
               _buildSquareContainer('assets/salir.png'),
             ],
           ),
