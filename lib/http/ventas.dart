@@ -29,7 +29,7 @@ class ventasHTTP {
   Future<dynamic> imprimir(String id, String ip_impresora) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var ip =  pref.getString('ip');
-    final link = Uri.parse("http://"+ip.toString()+":8000/imprimir-movil?id_venta="+id+"&ip="+ip_impresora);
+    final link = Uri.parse("http://"+ip.toString()+":8000/imprimir-movil?id_venta="+id+"&ip_impresora="+ip_impresora);
     dynamic response = await http.get(link);
     if (response.statusCode == 200) {
       return {
