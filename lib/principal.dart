@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sistema_inventario/categoria/listaCategorias.dart';
 import 'package:sistema_inventario/components/BouncyPageRoute.dart';
 import 'package:sistema_inventario/paginaInventario.dart';
 import 'package:sistema_inventario/producto/stock.dart';
 import 'package:sistema_inventario/proveedor/listaProveedores.dart';
+import 'package:sistema_inventario/ventasPage.dart';
 
 class Principal extends StatefulWidget {
   const Principal({Key? key}) : super(key: key);
@@ -96,6 +98,27 @@ class _PrincipalState extends State<Principal> {
                   );   
                 },
                 child: _buildSquareContainer('assets/stock.png'),
+              ),
+            ],
+          ),
+          const SizedBox(height: 40.0),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+             GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    BouncyPageRoute(widget: const ventasPage())
+                  );   
+                },
+                child:  _buildSquareContainer('assets/ventas.png'),
+              ),
+              GestureDetector(
+                onTap: () {
+                  SystemNavigator.pop();  
+                },
+                child: _buildSquareContainer('assets/salir.png'),
               ),
             ],
           ),
