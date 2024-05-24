@@ -4,6 +4,7 @@ import 'package:sistema_inventario/categoria/listaCategorias.dart';
 import 'package:sistema_inventario/components/BouncyPageRoute.dart';
 import 'package:sistema_inventario/paginaInventario.dart';
 import 'package:sistema_inventario/producto/stock.dart';
+import 'package:sistema_inventario/proveedor/listaProveedores.dart';
 
 class Principal extends StatefulWidget {
   const Principal({Key? key}) : super(key: key);
@@ -38,8 +39,15 @@ class _PrincipalState extends State<Principal> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Text("Sistema de Inventario", style: TextStyle(
-            color: Color(0xFF755DC1),
+            color: Color.fromARGB(255, 53, 36, 110),
             fontSize: 27,
+            fontFamily: 'Poppins',
+            fontWeight: FontWeight.w900,
+          )),
+          const SizedBox(height: 10.0),
+          const Text("(Por favor seleccione una opción)", style: TextStyle(
+            color: Color(0xFF755DC1),
+            fontSize: 21,
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w900,
           )),
@@ -56,14 +64,30 @@ class _PrincipalState extends State<Principal> {
                 },
                 child: _buildSquareContainer('assets/inventario.png'),
               ),
-             _buildSquareContainer('assets/clientes.png'),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    BouncyPageRoute(widget: const proveedorPage())
+                  );   
+                },
+                child: _buildSquareContainer('assets/proveedores.png'),
+              ),
             ],
           ),
           const SizedBox(height: 40.0),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildSquareContainer('assets/proveedores.png'),
+             GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    BouncyPageRoute(widget: const categoriaPage())
+                  );   
+                },
+                child:  _buildSquareContainer('assets/categorias.png'),
+              ),
               GestureDetector(
                 onTap: () {
                   Navigator.push(
@@ -73,22 +97,6 @@ class _PrincipalState extends State<Principal> {
                 },
                 child: _buildSquareContainer('assets/stock.png'),
               ),
-            ],
-          ),
-          const SizedBox(height: 40.0),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-               GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    BouncyPageRoute(widget: const categoriaPage())
-                  );   
-                },
-                child:  _buildSquareContainer('assets/categorias.png'),
-              ),
-              _buildSquareContainer('assets/salir.png'),
             ],
           ),
         ],

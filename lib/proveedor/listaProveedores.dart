@@ -1,23 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:sistema_inventario/http/categorias.dart';
+import 'package:flutter/widgets.dart';
+import 'package:sistema_inventario/http/Proveedores.dart';
 import 'package:sistema_inventario/http/response.dart';
 
-class categoriaPage extends StatefulWidget {
-  const categoriaPage({Key? key}) : super(key: key);
+class proveedorPage extends StatefulWidget {
+  const proveedorPage({Key? key}) : super(key: key);
   @override
-  State<categoriaPage> createState() => _categoriaPageState();
+  State<proveedorPage> createState() => _proveedorPageState();
 }
 
-class _categoriaPageState extends State<categoriaPage> {
+class _proveedorPageState extends State<proveedorPage> {
   String des = "todo";
-  late List<dynamic> listaCategorias = [];
+  late List<dynamic> listaProveedores = [];
 
   TextEditingController _controllerCB = TextEditingController();
-  TextEditingController _nombreCategoria = TextEditingController();
+  TextEditingController _nombreProveedor = TextEditingController();
 
-  TextEditingController _nombreCategoriaEditar = TextEditingController();
-  String _idCategoriaEditar = "";
-  String _idCategoriaEliminar = '';
+  TextEditingController _nombreProveedorEditar = TextEditingController();
+  String _idProveedorEditar = "";
+  String _idProveedorEliminar = "";
 
   bool cargando = true;
 
@@ -27,7 +28,7 @@ class _categoriaPageState extends State<categoriaPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    this.listarCategorias();
+    this.listarProveedores();
   }
   @override
   Widget build(BuildContext context) {
@@ -39,7 +40,7 @@ class _categoriaPageState extends State<categoriaPage> {
         backgroundColor: Colors.transparent,
         title: Container(
           padding: const EdgeInsets.only(left: 30),
-          child: const Text("Categorias"),
+          child: const Text("Proveedores"),
         ),
       ),
       body: Column(
@@ -54,7 +55,7 @@ class _categoriaPageState extends State<categoriaPage> {
                   width: size.width * 0.70,
                   child: TextField(
                       controller: _controllerCB,
-                      decoration: const InputDecoration(labelText: 'Buscar categoria', 
+                      decoration: const InputDecoration(labelText: 'Buscar proveedor', 
                         labelStyle: TextStyle(
                           color: Color(0xFF755DC1),
                           fontSize: 15,
@@ -87,7 +88,7 @@ class _categoriaPageState extends State<categoriaPage> {
                 ),
                 child: ElevatedButton(
                   style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(const Color.fromARGB(255, 87, 28, 134)), // Change the color here
+                    backgroundColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 87, 28, 134)), // Change the color here
                   ),
                   onPressed: () { 
                     setState(() {
@@ -95,7 +96,7 @@ class _categoriaPageState extends State<categoriaPage> {
                       if(des == ""){
                         des = "todo";
                       }
-                      listarCategorias();
+                      listarProveedores();
                     });
                   },
                   child: const Row(
@@ -117,7 +118,7 @@ class _categoriaPageState extends State<categoriaPage> {
             ),
             child: ElevatedButton(
               style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all<Color>(Color.fromARGB(225, 86, 28, 134)), // Change the color here
+                backgroundColor: WidgetStateProperty.all<Color>(const Color.fromARGB(225, 86, 28, 134)), // Change the color here
               ),
               onPressed: () => modalRegistrar(context),
               child: const Row(
@@ -125,7 +126,7 @@ class _categoriaPageState extends State<categoriaPage> {
                   Icon(Icons.add, color: Colors.white, size: 30),
                   SizedBox(width: 20),
                   Text(
-                    "Agregar nueva categoria",
+                    "Agregar nueva proveedor",
                     style: TextStyle(
                       color: Color.fromARGB(255, 255, 255, 255),
                       fontSize: 15,
@@ -140,125 +141,124 @@ class _categoriaPageState extends State<categoriaPage> {
           const SizedBox(height: 30),
           Container(
           height: 530,
-          padding: const EdgeInsets.all(16.0),
-          color: const Color.fromARGB(0, 250, 250, 250),
+          padding: EdgeInsets.all(16.0),
+          color: Color.fromARGB(0, 250, 250, 250),
             child: SingleChildScrollView(
               scrollDirection: Axis.vertical,
               child: Column(
-                  children: [
-                    cargando == false ? Container(
-                      width: size.width,
-                      child: listaCategorias.isNotEmpty
-                        ? Container (
-                          padding: const EdgeInsets.all(20),
-                          child: DataTable(
-                            headingRowColor: MaterialStateColor.resolveWith((states) => Color.fromARGB(255, 226, 159, 226)),
-                            columns: const [
-                              DataColumn(label: Text('Nombre', style: TextStyle( fontFamily: 'Poppins', fontWeight: FontWeight.bold))),
-                              DataColumn(label: Text('Opciones', style: TextStyle( fontFamily: 'Poppins', fontWeight: FontWeight.bold), textAlign: TextAlign.center)),
-                            ],
-                            rows: listaCategorias
-                                .map(
-                                  (producto) => DataRow(
-                                    cells: [
-                                      DataCell(Text(producto['nombre'][0].toString().toUpperCase()+producto['nombre'].toString().substring(1), style: const TextStyle( fontFamily: 'Poppins'))),
-                                      DataCell(
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            GestureDetector(
-                                              onTap: () {
-                                                setState(() {
-                                                  _idCategoriaEliminar = producto['id'].toString();
-                                                });
-                                                showDialog(
-                                                  context: context,
-                                                  builder: (BuildContext context) {
-                                                    return AlertDialog(
-                                                      title: const Text('Confirmación'),
-                                                      content: const Text('¿Está seguro que desea eliminar esta categoría?'),
-                                                      actions: <Widget>[
-                                                        TextButton(
-                                                          child: const Text('No'),
-                                                          onPressed: () {
-                                                            Navigator.of(context).pop();
-                                                            setState(() {
-                                                              _idCategoriaEliminar = '';
-                                                            });
-                                                          },
-                                                          style: TextButton.styleFrom(
-                                                            backgroundColor: Colors.red,
-                                                            foregroundColor: Colors.white
-                                                          ),
-                                                        ),
-                                                        TextButton(
-                                                          child: const Text('Sí'),
-                                                          onPressed: () {
-                                                            _eliminarCategoria(context);
-                                                          },
-                                                          style: TextButton.styleFrom(
-                                                            backgroundColor: Colors.green,
-                                                            foregroundColor: Colors.white
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    );
-                                                  },
-                                                );
-                                              },
-                                              child: const Icon(Icons.delete_rounded, color: Colors.red),
-                                            ),
-                                            const SizedBox(width: 20),
-                                            GestureDetector(
+                children: [
+                  cargando == false ? SizedBox(
+                    width: size.width,
+                    child: listaProveedores.isNotEmpty
+                      ? Container (
+                        padding: const EdgeInsets.all(20),
+                        child: DataTable(
+                          headingRowColor: WidgetStateColor.resolveWith((states) => const Color.fromARGB(255, 226, 159, 226)),
+                          columns: const [
+                            DataColumn(label: Text('Nombre', style: TextStyle( fontFamily: 'Poppins', fontWeight: FontWeight.bold))),
+                            DataColumn(label: Text('Opciones', style: TextStyle( fontFamily: 'Poppins', fontWeight: FontWeight.bold), textAlign: TextAlign.center)),
+                          ],
+                          rows: listaProveedores
+                              .map(
+                                (producto) => DataRow(
+                                  cells: [
+                                    DataCell(Text(producto['nombre'][0].toString().toUpperCase()+producto['nombre'].toString().substring(1), style: const TextStyle( fontFamily: 'Poppins'))),
+                                    DataCell(
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          GestureDetector(
                                             onTap: () {
                                               setState(() {
-                                                _idCategoriaEditar = producto['id'].toString();
-                                                _nombreCategoriaEditar.text = producto['nombre'].toString();
+                                                _idProveedorEliminar = producto['id'].toString();
+                                              });
+                                              showDialog(
+                                                context: context,
+                                                builder: (BuildContext context) {
+                                                  return AlertDialog(
+                                                    title: const Text('Confirmación'),
+                                                    content: const Text('¿Está seguro que desea eliminar el proveedor?'),
+                                                    actions: <Widget>[
+                                                      TextButton(
+                                                        child: const Text('No'),
+                                                        onPressed: () {
+                                                          Navigator.of(context).pop();
+                                                          setState(() {
+                                                            _idProveedorEliminar = '';
+                                                          });
+                                                        },
+                                                        style: TextButton.styleFrom(
+                                                          backgroundColor: Colors.red,
+                                                          foregroundColor: Colors.white
+                                                        ),
+                                                      ),
+                                                      TextButton(
+                                                        child: const Text('Sí'),
+                                                        onPressed: () {
+                                                          _eliminarProveedor(context);
+                                                        },
+                                                        style: TextButton.styleFrom(
+                                                          backgroundColor: Colors.green,
+                                                          foregroundColor: Colors.white
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  );
+                                                },
+                                              );
+                                            },
+                                            child: const Icon(Icons.delete_rounded, color: Colors.red),
+                                          ),
+                                          const SizedBox(width: 20),
+                                          GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                _idProveedorEditar = producto['id'].toString();
+                                                _nombreProveedorEditar.text = producto['nombre'].toString();
                                                 modalEditar(context);
                                               });
                                             },
                                             child: const Icon(Icons.edit, color: Colors.orange),
                                           )
-                                          ],
-                                        )
-                                      ),
-                                    ],
-                                    onLongPress: () {}
-                                  )
+                                        ],
+                                      )
+                                    ),
+                                  ],
                                 )
-                                .toList(),
-                          )
-                        ) : const Center(
-                          child: Column(
-                            children: [
-                              Image(
-                                image: AssetImage('assets/sin_productos.png')
-                              ),
-                              SizedBox(height: 10),
-                              Text(
-                                "No se encontraron categorías",
-                                style: TextStyle(
-                                  color: Color(0xFF755DC1),
-                                  fontFamily: 'Poppins',
-                                  fontWeight: FontWeight.bold
-                                ),
                               )
-                            ],
-                          )
-                        ),
-                    ) : Container(
-                      width: size.width,
-                      height: 400,
-                      child: const Center(
-                        child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation(Color(0xFF755DC1)),
-                          backgroundColor: Color.fromARGB(255, 160, 159, 159),
-                          strokeWidth: 7,
-                        ),
+                              .toList(),
+                        )
+                      ) : const Center(
+                        child: Column(
+                          children: [
+                            Image(
+                              image: AssetImage('assets/sin_productos.png')
+                            ),
+                            SizedBox(height: 10),
+                            Text(
+                              "No se encontraron proveedores",
+                              style: TextStyle(
+                                color: Color(0xFF755DC1),
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.bold
+                              ),
+                            )
+                          ],
+                        )
                       ),
-                    ) 
-                  ],
-                ),  
+                  ) : SizedBox(
+                    width: size.width,
+                    height: 400,
+                    child: const Center(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation(Color(0xFF755DC1)),
+                        backgroundColor: Color.fromARGB(255, 160, 159, 159),
+                        strokeWidth: 7,
+                      ),
+                    ),
+                  ) 
+                ],
+              ),  
             )
           )      
         ],
@@ -280,7 +280,7 @@ class _categoriaPageState extends State<categoriaPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   const Text(
-                    'Registrar nueva categoria',
+                    'Registrar nuevo proveedor',
                     style:  TextStyle(
                       color: Color(0xFF755DC1),
                       fontSize: 20,
@@ -293,7 +293,7 @@ class _categoriaPageState extends State<categoriaPage> {
                   TextField(
                     keyboardType: TextInputType.text,
                     decoration: const InputDecoration(
-                      labelText: 'Nombre de la categoria', 
+                      labelText: 'Nombre del proveedor', 
                       labelStyle: TextStyle(
                         color: Color(0xFF755DC1),
                         fontSize: 15,
@@ -315,7 +315,7 @@ class _categoriaPageState extends State<categoriaPage> {
                         ),
                       ),
                     ),
-                    controller: _nombreCategoria,
+                    controller: _nombreProveedor,
                     enabled: true,
                   ),
                   const SizedBox(height: 40),
@@ -324,9 +324,9 @@ class _categoriaPageState extends State<categoriaPage> {
                     children: [
                       ElevatedButton(
                         style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all<Color>(const Color.fromARGB(255, 16, 83, 7)), // Change the color here
+                          backgroundColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 16, 83, 7)), // Change the color here
                         ),
-                        onPressed: () => _registrarCategoria(context),
+                        onPressed: () => _registrarProveedor(context),
                         child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -339,11 +339,11 @@ class _categoriaPageState extends State<categoriaPage> {
                       const SizedBox(width: 20),
                       ElevatedButton(
                         style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all<Color>(const Color.fromARGB(255, 177, 10, 10)), // Change the color here
+                          backgroundColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 177, 10, 10)), // Change the color here
                         ),
                         onPressed: () {
                           setState(() {
-                            _nombreCategoria.text = '';
+                            _nombreProveedor.text = '';
                           });
                           Navigator.of(context).pop(); 
                         },
@@ -381,7 +381,7 @@ class _categoriaPageState extends State<categoriaPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   const Text(
-                    'Editar categoría',
+                    'Editar proveedor',
                     style:  TextStyle(
                       color: Color(0xFF755DC1),
                       fontSize: 20,
@@ -394,7 +394,7 @@ class _categoriaPageState extends State<categoriaPage> {
                   TextField(
                     keyboardType: TextInputType.text,
                     decoration: const InputDecoration(
-                      labelText: 'Nombre de la categoría', 
+                      labelText: 'Nombre del proveedor', 
                       labelStyle: TextStyle(
                         color: Color(0xFF755DC1),
                         fontSize: 15,
@@ -416,7 +416,7 @@ class _categoriaPageState extends State<categoriaPage> {
                         ),
                       ),
                     ),
-                    controller: _nombreCategoriaEditar,
+                    controller: _nombreProveedorEditar,
                     enabled: true,
                   ),
                   const SizedBox(height: 40),
@@ -427,7 +427,7 @@ class _categoriaPageState extends State<categoriaPage> {
                         style: ButtonStyle(
                           backgroundColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 16, 83, 7)), // Change the color here
                         ),
-                        onPressed: () => _editarCategoria(context),
+                        onPressed: () => _editarProveedor(context),
                         child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -444,8 +444,8 @@ class _categoriaPageState extends State<categoriaPage> {
                         ),
                         onPressed: () {
                           setState(() {
-                            _idCategoriaEditar = "";
-                            _nombreCategoriaEditar.text = '';
+                            _idProveedorEditar = "";
+                            _nombreProveedorEditar.text = '';
                           });
                           Navigator.of(context).pop(); 
                         },
@@ -469,28 +469,28 @@ class _categoriaPageState extends State<categoriaPage> {
     );
   }
 
-  void listarCategorias() async {
+  void listarProveedores() async {
     setState(() {
       cargando = true;
-      listaCategorias = [];
+      listaProveedores = [];
     });
     
-    CategoriasHTTP request = CategoriasHTTP();
-    dynamic response = await request.listarCategorias(des);
+    ProveedoresHTTP request = ProveedoresHTTP();
+    dynamic response = await request.listarProveedores(des);
     setState(() {
-      listaCategorias = response;
+      listaProveedores = response;
       cargando = false;
     });
   }
 
-  Future<void> _registrarCategoria(BuildContext context) async{ 
+  Future<void> _registrarProveedor(BuildContext context) async{ 
     mostrarDialogo(context);
-    CategoriasHTTP categoriasHTTP = CategoriasHTTP();
-    ResponseHttp response =  await categoriasHTTP.registrarCategoria(_nombreCategoria.text);
+    ProveedoresHTTP proveedoresHTTP = ProveedoresHTTP();
+    ResponseHttp response =  await proveedoresHTTP.registrarProveedor(_nombreProveedor.text);
     cerrarDialogo(context);
     if(response.success == 1){
       setState(() {
-        _nombreCategoria.text = '';
+        _nombreProveedor.text = '';
       });
       showDialog(
         context: context,
@@ -498,7 +498,7 @@ class _categoriaPageState extends State<categoriaPage> {
         builder: (BuildContext context) {
           return AlertDialog(
             content: Container(
-              height: 150,
+              height: 100,
               child: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -507,11 +507,11 @@ class _categoriaPageState extends State<categoriaPage> {
                     const SizedBox(height: 20),
                     Text(
                       response.mensaje,
-                      style: const TextStyle(
-                        color: Color(0xFF755DC1),
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.bold
-                      ),
+                       style: const TextStyle(
+                          color: Color(0xFF755DC1),
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.bold
+                        ),
                     ),
                   ],
                 ),
@@ -525,7 +525,7 @@ class _categoriaPageState extends State<categoriaPage> {
         Navigator.of(context).pop(); 
         Navigator.of(context).pop(); 
         setState(() {
-          listarCategorias();
+          listarProveedores();
         });
       });
       
@@ -565,15 +565,15 @@ class _categoriaPageState extends State<categoriaPage> {
     }
   }
 
-  Future<void> _editarCategoria(BuildContext context) async{ 
+  Future<void> _editarProveedor(BuildContext context) async{ 
     mostrarDialogo(context);
-    CategoriasHTTP categoriasHTTP = CategoriasHTTP();
-    ResponseHttp response =  await categoriasHTTP.editarCategoria(_idCategoriaEditar, _nombreCategoriaEditar.text);
+    ProveedoresHTTP proveedoresHTTP = ProveedoresHTTP();
+    ResponseHttp response =  await proveedoresHTTP.editarProveedor(_idProveedorEditar, _nombreProveedorEditar.text);
     cerrarDialogo(context);
     if(response.success == 1){
       setState(() {
-        _idCategoriaEditar = '';
-        _nombreCategoriaEditar.text = '';
+        _idProveedorEditar = '';
+        _nombreProveedorEditar.text = '';
       });
       showDialog(
         context: context,
@@ -608,7 +608,7 @@ class _categoriaPageState extends State<categoriaPage> {
         Navigator.of(context).pop(); 
         Navigator.of(context).pop(); 
         setState(() {
-          listarCategorias();
+          listarProveedores();
         });
       });
       
@@ -648,11 +648,11 @@ class _categoriaPageState extends State<categoriaPage> {
     }
   }
 
-  Future<void> _eliminarCategoria(BuildContext context) async{ 
-    CategoriasHTTP categoriasHTTP = CategoriasHTTP();
-    ResponseHttp response =  await categoriasHTTP.eliminar(_idCategoriaEliminar);
+  Future<void> _eliminarProveedor(BuildContext context) async{ 
+    ProveedoresHTTP proveedoresHTTP = ProveedoresHTTP();
+    ResponseHttp response =  await proveedoresHTTP.eliminar(_idProveedorEliminar);
     setState(() {
-      _idCategoriaEliminar = '';
+      _idProveedorEliminar = '';
     });
     showDialog(
       context: context,
@@ -690,7 +690,7 @@ class _categoriaPageState extends State<categoriaPage> {
       Navigator.of(context).pop(); 
       setState(() {
         if(response.success == 1){
-          listarCategorias();
+          listarProveedores();
         }
       });
     });

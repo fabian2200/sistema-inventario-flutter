@@ -6,37 +6,37 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sistema_inventario/http/response.dart';
 
 
-class CategoriasHTTP {
-  Future<List<dynamic>> listarCategorias(String des) async {
-    List<dynamic> categorias = [];
+class ProveedoresHTTP {
+  Future<List<dynamic>> listarProveedores(String des) async {
+    List<dynamic> proveedores = [];
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     var ip =  pref.getString('ip');
 
-    final link = Uri.parse("http://"+ip.toString()+":8000/listar-categorias?des="+des);
+    final link = Uri.parse("http://"+ip.toString()+":8000/listar-proveedores?des="+des);
     final response = await http.get(link);
     if (response.statusCode != 200) {
-      categorias = [];
+      proveedores = [];
     } else {
       var json = convert.jsonDecode(response.body);
       final length = json.length;
       if (length > 0) {
-        categorias = json;
+        proveedores = json;
       }
     }
-    return categorias;
+    return proveedores;
   }
 
-  Future<ResponseHttp> registrarCategoria(nombreCategoria) async {
+  Future<ResponseHttp> registrarProveedor(nombreProveedor) async {
     Dio dio = Dio();
     ResponseHttp responseHttp = ResponseHttp("", 0);
     SharedPreferences pref = await SharedPreferences.getInstance();
-
+    
     var ip =  pref.getString('ip');
-    final link = "http://"+ip.toString()+":8000/registrar-categoria-movil";
+    final link = "http://"+ip.toString()+":8000/registrar-proveedor-movil";
 
     Map<String, dynamic> data = {
-      "nombre": nombreCategoria
+      "nombre": nombreProveedor
     };
 
     try {
@@ -61,17 +61,17 @@ class CategoriasHTTP {
     return responseHttp;
   }
 
-  Future<ResponseHttp> editarCategoria(id, nombreCategoria) async {
+  Future<ResponseHttp> editarProveedor(id, nombreProveedor) async {
     Dio dio = Dio();
     ResponseHttp responseHttp = ResponseHttp("", 0);
     SharedPreferences pref = await SharedPreferences.getInstance();
     
     var ip =  pref.getString('ip');
-    final link = "http://"+ip.toString()+":8000/editar-categoria-movil";
+    final link = "http://"+ip.toString()+":8000/editar-proveedor-movil";
 
     Map<String, dynamic> data = {
       "id": id,
-      "nombre": nombreCategoria
+      "nombre": nombreProveedor
     };
 
     try {
@@ -102,8 +102,9 @@ class CategoriasHTTP {
     SharedPreferences pref = await SharedPreferences.getInstance();
     
     var ip =  pref.getString('ip');
-    final link = "http://"+ip.toString()+":8000/eliminar-categoria-movil?id="+id;
+    final link = "http://"+ip.toString()+":8000/eliminar-proveedor-movil?id="+id;
 
+    
     try {
       Response response = await dio.get(link);
       var json = convert.jsonDecode(response.toString());

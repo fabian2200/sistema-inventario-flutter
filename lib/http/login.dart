@@ -8,7 +8,7 @@ class Login {
 
   Future<dynamic> loguear() async {
     dynamic respuesta = {};
-    if (usuario == "user123" && password == "123") {
+    if (usuario == "admin" && password == "admin2024") {
       respuesta["mensaje"] = "Bienvenido";
       respuesta["success"] = 1;
       SharedPreferences pref = await SharedPreferences.getInstance();
