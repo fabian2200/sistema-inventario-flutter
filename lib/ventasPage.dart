@@ -1,6 +1,5 @@
 // ignore_for_file: prefer_const_constructors
 import 'package:flutter/material.dart';
-import 'package:sistema_inventario/http/response.dart';
 import 'package:sistema_inventario/http/ventas.dart';
 import 'package:intl/intl.dart';
 
@@ -14,6 +13,7 @@ class _ventasPageState extends State<ventasPage> {
   
   String des = "todo";
   late List<dynamic> listaVentas = [];
+  late List<dynamic> listaImpresoras = [];
   TextEditingController _controllerCB = TextEditingController();
   bool cargando = true;
   late Size size;
@@ -25,6 +25,7 @@ class _ventasPageState extends State<ventasPage> {
     // TODO: implement initState
     super.initState();
     this.listarVentas();
+    listarImpresoras();
   }
 
   @override
@@ -107,9 +108,9 @@ class _ventasPageState extends State<ventasPage> {
           ),
           const SizedBox(height: 20),
           Container(
-          height: 680,
-          padding: const EdgeInsets.all(16.0),
-          color: const Color.fromARGB(0, 250, 250, 250),
+            height: 680,
+            padding: const EdgeInsets.all(16.0),
+            color: const Color.fromARGB(0, 250, 250, 250),
             child: cargando == false ? SizedBox(
               width: size.width,
               child: listaVentas.isNotEmpty ?
@@ -125,13 +126,13 @@ class _ventasPageState extends State<ventasPage> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20.0),
                         ),
-                        color: Color.fromARGB(255, 101, 45, 145),
+                        color: Color.fromARGB(255, 131, 72, 175),
                         elevation: 5,
                         child: Container(
                           width: MediaQuery.of(context).size.width,
-                          margin: const EdgeInsets.only(bottom: 10),
+                          margin: const EdgeInsets.only(bottom: 6),
                           decoration: const BoxDecoration(
-                              color: Color.fromARGB(255, 232, 220, 248),
+                              color: Color.fromARGB(255, 234, 220, 255),
                               borderRadius: BorderRadius.vertical(
                                 bottom : Radius.circular(20),
                                 top: Radius.circular(20)
@@ -155,38 +156,151 @@ class _ventasPageState extends State<ventasPage> {
                                                 ),
                                                 cryptoNameSymbol("Factura #", listaVentas[index]["id"].toString()),
                                                 Spacer(),
-                                                 ElevatedButton(
-                                                  onPressed: () => _imprimirFactura(context, listaVentas[index]["id"].toString()),
+                                                ElevatedButton(
+                                                  onPressed: () {
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext context) {
+                                                        return AlertDialog(
+                                                          title: const Text(
+                                                            'Seleccione la impresora',
+                                                            style: TextStyle(
+                                                              color: Color(0xFF755DC1),
+                                                              fontFamily: 'Poppins',
+                                                            ),
+                                                          ),
+                                                          content: Container(
+                                                            width: double.maxFinite,  // Asegura que el contenedor se expanda al máximo ancho posible
+                                                            height: 400,
+                                                            child: Column(
+                                                              children: [
+                                                                SizedBox(height: 30),
+                                                                Expanded(
+                                                                  child: listaImpresoras.isNotEmpty
+                                                                      ? ListView.builder(
+                                                                          itemCount: listaImpresoras.length,
+                                                                          itemBuilder: (context, index2) {
+                                                                            return GestureDetector(
+                                                                              onTap: () {
+                                                                                _imprimirFactura(context, listaVentas[index2]["id"].toString(), listaImpresoras[index2]["ip"]);
+                                                                              },
+                                                                              child: Container(
+                                                                                height: 130,  // Ajusta la altura según sea necesario
+                                                                                margin: const EdgeInsets.symmetric(vertical: 5), // Agrega un margen entre los elementos
+                                                                                decoration: BoxDecoration(
+                                                                                  borderRadius: BorderRadius.circular(10),
+                                                                                  color: Color.fromARGB(255, 208, 197, 245),
+                                                                                ),
+                                                                                child:Column(
+                                                                                  children: [
+                                                                                    Image(
+                                                                                      height: 70,
+                                                                                      image: AssetImage('assets/impresora.png')
+                                                                                    ),
+                                                                                    Text(
+                                                                                      listaImpresoras[index2]["nombre"],  // Muestra el nombre o información de la impresora
+                                                                                      style: const TextStyle(
+                                                                                        color: Color(0xFF755DC1),
+                                                                                        fontFamily: 'Poppins',
+                                                                                        fontWeight: FontWeight.bold
+                                                                                      ),
+                                                                                    ),
+                                                                                    SizedBox(height: 10),
+                                                                                     Text(
+                                                                                      listaImpresoras[index2]["ip"],  // Muestra el nombre o información de la impresora
+                                                                                      style: const TextStyle(
+                                                                                        color: Color(0xFF755DC1),
+                                                                                        fontFamily: 'Poppins',
+                                                                                      ),
+                                                                                    ),
+                                                                                  ],
+                                                                                ) 
+                                                                              ),
+                                                                            );
+                                                                          },
+                                                                        )
+                                                                      : const Center(
+                                                                          child: Text(
+                                                                            "No hay impresoras registradas en el sistema.",
+                                                                            style: TextStyle(
+                                                                              color: Color(0xFF755DC1),
+                                                                              fontFamily: 'Poppins',
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        );
+                                                      },
+                                                    );
+                                                  },
                                                   style: ElevatedButton.styleFrom(
-                                                    backgroundColor: Color.fromARGB(255, 71, 45, 121),
-                                                    fixedSize: Size(60, 60),
-                                                    shape: RoundedRectangleBorder( // Define la forma del botón
-                                                      borderRadius: BorderRadius.circular(10), // Radio de borde cero para forma cuadrada
+                                                    side: BorderSide(color: Color.fromARGB(255, 71, 45, 121), width: 2),
+                                                    padding: EdgeInsets.symmetric(horizontal: 4.0, vertical: 4.0),
+                                                    backgroundColor: Color.fromARGB(255, 215, 202, 240),
+                                                    fixedSize: Size(40, 60),
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.circular(15), // Radio de borde cero para forma cuadrada
                                                     ),
                                                   ),
                                                   child: Icon(
-                                                      Icons.print, 
-                                                      size: 22, 
-                                                      color: Colors.white
-                                                    )
+                                                    Icons.print, 
+                                                    size: 35, 
+                                                    color: Color.fromARGB(255, 71, 45, 121)
+                                                  )
                                                 ),
                                                 SizedBox(
-                                                  width: 10,
+                                                  width: 3,
                                                 )
                                               ],
                                             ),
-                                            cryptoNameSymbol("Fecha: ", listaVentas[index]["fecha"].toString()),
-                                            SizedBox(height: 5),
                                             Row(
-                                              mainAxisAlignment: MainAxisAlignment.start,
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
-                                                cryptoAmount(listaVentas[index]["total"], listaVentas[index]["cliente"]),
+                                                Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    cryptoNameSymbol("Fecha: ", listaVentas[index]["fecha"].toString()),
+                                                    SizedBox(height: 5),
+                                                    Row(
+                                                      mainAxisAlignment: MainAxisAlignment.start,
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        cryptoAmount(listaVentas[index]["total"], listaVentas[index]["cliente"]),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                                Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                                  children: [
+                                                    ElevatedButton(
+                                                      onPressed: () => _detalleVenta(context, listaVentas[index]["id"].toString()),
+                                                      style: ElevatedButton.styleFrom(
+                                                        side: BorderSide(color: Color.fromARGB(255, 71, 45, 121), width: 2),
+                                                        padding: EdgeInsets.symmetric(horizontal: 4.0, vertical: 4.0),
+                                                       backgroundColor: Color.fromARGB(255, 215, 202, 240),
+                                                        fixedSize: Size(40, 60),
+                                                        shape: RoundedRectangleBorder( // Define la forma del botón
+                                                          borderRadius: BorderRadius.circular(15), // Radio de borde cero para forma cuadrada
+                                                        ),
+                                                      ),
+                                                      child: Icon(
+                                                        Icons.remove_red_eye_sharp, 
+                                                        size: 32, 
+                                                        color: Color.fromARGB(255, 71, 45, 121)
+                                                      )
+                                                    ),
+                                                  ],
+                                                ),
+                                                
                                               ],
                                             )
-                                           
                                           ],
-                                        ))
+                                        )
+                                      ),
                                   ],
                                 ),
                               )
@@ -246,6 +360,20 @@ class _ventasPageState extends State<ventasPage> {
     });
   }
 
+  void listarImpresoras() async {
+    setState(() {
+      cargando = true;
+      listaImpresoras = [];
+    });
+      
+    ventasHTTP request = ventasHTTP();
+    dynamic response = await request.listarImpresoras();
+    setState(() {
+      listaImpresoras = response;
+      cargando = false;
+    });
+  }
+
   Widget cryptoNameSymbol(principal ,id) {
     return Align(
       alignment: Alignment.centerLeft,
@@ -268,7 +396,7 @@ class _ventasPageState extends State<ventasPage> {
   }
 
  
-  Future<void> _imprimirFactura(BuildContext context, id) async{ 
+  Future<void> _imprimirFactura(BuildContext context, id, ip_impresora) async{ 
     showDialog(
       context: context,
       barrierDismissible: true,
@@ -293,7 +421,7 @@ class _ventasPageState extends State<ventasPage> {
     );
 
     ventasHTTP ventaste = ventasHTTP();
-    dynamic response = await ventaste.imprimir(id, '192.168.1.222');
+    dynamic response = await ventaste.imprimir(id, ip_impresora);
 
     showDialog(
       context: context,
@@ -327,6 +455,7 @@ class _ventasPageState extends State<ventasPage> {
     );
 
     Future.delayed(const Duration(seconds: 3), () {
+      Navigator.of(context).pop(); 
       Navigator.of(context).pop(); 
       Navigator.of(context).pop(); 
     });
@@ -382,4 +511,256 @@ class _ventasPageState extends State<ventasPage> {
         ),
       );
   }
+
+
+   Future<void> _detalleVenta(BuildContext context, id) async{ 
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Container(
+            height: 80,
+            child: Center(
+              child: 
+                  Text(
+                    "Buscando detalle de la venta...",
+                    style: const TextStyle(
+                        color: Color(0xFF755DC1),
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.bold
+                      ),
+                  ),
+            ),
+          ),
+        );
+      }
+    );
+
+    ventasHTTP ventaste = ventasHTTP();
+    dynamic response = await ventaste.infoVenta(id);
+
+    if(response['success'] == 0){
+      showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Container(
+              height: 150,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    const Icon(Icons.close, size: 50, color: Colors.red),
+                    const SizedBox(height: 20),
+                    Text(
+                      response['mensaje'],
+                      style: const TextStyle(
+                          color: Color(0xFF755DC1),
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.bold
+                        ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
+      );
+    }else{
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            actions: [
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 4.0),
+                  backgroundColor: Color.fromARGB(255, 168, 35, 25),
+                  shape: RoundedRectangleBorder( // Define la forma del botón
+                    borderRadius: BorderRadius.circular(15), // Radio de borde cero para forma cuadrada
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop(); 
+                  Navigator.of(context).pop(); 
+                }, 
+                child: Text("Cerrar" , style: TextStyle(fontFamily: 'Poppins', color: Colors.white))
+              )
+            ],
+            content: Container(
+              width: 410,
+              height: 550,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    SizedBox(height: 20),
+                    Text(
+                      'Detalle Factura #'+id,
+                      style: TextStyle(
+                          color: Color(0xFF755DC1),
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.bold
+                        ),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      'Fecha factura'+response["objeto"]["fecha_venta"],
+                      style: TextStyle(
+                          color: Color(0xFF755DC1),
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.bold
+                        ),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      'Cliente: '+response["objeto"]["cliente"],
+                      style: TextStyle(
+                          color: Color(0xFF755DC1),
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.bold
+                        ),
+                    ),
+                    SizedBox(height: 20),
+                    Text(
+                      '----------- Detalle de venta -----------',
+                      style: TextStyle(
+                          color: Color(0xFF755DC1),
+                          fontFamily: 'Poppins',
+                        ),
+                    ),
+                    SizedBox(height: 10),
+                    Container(
+                      padding: EdgeInsets.all(10),
+                      height: 280,
+                      color: const Color.fromARGB(255, 245, 242, 235),
+                      child: ListView.builder(
+                        itemCount: response["objeto"]["productos"].length,
+                        itemBuilder: (context, index3) {
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    formatToTwoDecimals(response["objeto"]["productos"][index3]["cantidad"]),
+                                    style: TextStyle(
+                                      fontFamily: 'Poppins',
+                                      fontSize: 12
+                                    ),
+                                  ),
+                                  SizedBox(width: 3),
+                                  Text(
+                                    response["objeto"]["productos"][index3]["unidad"],
+                                    style: TextStyle(
+                                      fontFamily: 'Poppins',
+                                      fontSize: 12
+                                    ),
+                                  )
+                                ],
+                              ),
+                              SizedBox(width: 4),
+                              Container(
+                                width: 150,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      response["objeto"]["productos"][index3]["descripcion"],
+                                      style: TextStyle(
+                                        fontFamily: 'Poppins',
+                                        fontSize: 12
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(width: 20),
+                              Row(
+                                children: [
+                                  Text(
+                                    "\$"+formatToTwoDecimals(response["objeto"]["productos"][index3]["total"].toString()),
+                                    style: TextStyle(
+                                      fontFamily: 'Poppins',
+                                      fontSize: 12
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      '-------------------------------------',
+                      style: TextStyle(
+                          color: Color(0xFF755DC1),
+                          fontFamily: 'Poppins',
+                        ),
+                    ),
+                    SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          "Subtotal \$"+formatToTwoDecimals(response["objeto"]["total_pagar"].toString()),
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 5),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          "Domicilio \$"+formatToTwoDecimals(response["objeto"]["valor_domicilio"].toString()),
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 5),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          "Total \$"+formatToTwoDecimals(response["objeto"]["total_con_domi"].toString()),
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
+      );
+    }
+  }
+
+  String formatToTwoDecimals(String cantidad) {
+    double cantidadDouble = double.parse(cantidad);
+    double cantidadRedondeada = double.parse((cantidadDouble).toStringAsFixed(2));
+    return cantidadRedondeada.toString();
+  }
+
 }
